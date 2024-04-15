@@ -1,0 +1,47 @@
+@page "/series/{seriesId}"
+@using EpisodeFinder.Database.Entities
+@using EpisodeFinder.Services
+@attribute [StreamRendering]
+@inject SeriesService seriesService;
+
+@if (_series == null)
+{
+    return;
+}
+<PageTitle>@_series.Title</PageTitle>
+<h1>@_series.Title</h1>
+
+@foreach (var season in _series.Seasons.OrderBy(s => s.SeasonNumber))
+{
+    <h2>@season.SeasonName</h2>
+    <ul>
+        @foreach (var episode in season.Episodes.OrderBy(e => e.EpisodeNumber))
+        {
+            var missing = episode.PlexRatingKey == null;
+            <li>Episode @episode.EpisodeNumber: @episode.Title
+                @if (missing)
+                {
+                    <span> - missing</span>
+                }
+            </li>
+        }
+    </ul>
+}
+
+
+@code {
+
+    [Parameter]
+    public string? SeriesId { get; set; }
+
+    Series? _series;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var idValid = int.TryParse(SeriesId, out var id);
+        if (!idValid) return;
+        _series = await seriesService.GetSeriesData(id);
+    }
+
+
+}

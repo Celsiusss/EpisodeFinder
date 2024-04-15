@@ -1,0 +1,46 @@
+﻿@page "/"
+@using EpisodeFinder.Services
+@using EpisodeFinder.Database.Entities
+@rendermode InteractiveServer
+@inject SeriesService seriesService;
+@inject PlexService plexService
+@inject TmdbService tmdbService;
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<button @onclick="DoScan">scan library</button>
+<button @onclick="TmdbUpdate">tmdb update</button>
+
+<ul>
+@foreach (var series in seriesListy)
+{
+    var url = "series/" + series.Id;
+    <li><NavLink href="@url">@series.Title</NavLink></li>
+}
+</ul>
+
+@code {
+    List<Series> seriesListy = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        // titles = await plexService.GetAllSeries();'
+        seriesListy = await seriesService.GetAllSeries();
+
+    }
+
+    async void DoScan()
+    {
+        await plexService.ScanLibrary();
+    }
+
+    async void TmdbUpdate()
+    {
+        await tmdbService.FillData();
+    }
+
+}

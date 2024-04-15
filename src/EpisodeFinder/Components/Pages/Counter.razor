@@ -1,0 +1,37 @@
+﻿@using EpisodeFinder.Models
+@using EpisodeFinder.Services
+@rendermode InteractiveServer
+@page "/counter"
+@inject PlexService _plexService
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<EditForm Model="Model" OnValidSubmit="Submit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <InputText @bind-Value="Model!.Field" />
+    <button type="submit">Submit</button>
+    <p>@_result</p>
+</EditForm>
+
+@code {
+    [SupplyParameterFromForm]
+    private Test? Model { get; set; }
+
+    private string _result = "";
+    
+    protected override void OnInitialized()
+    {
+        Model ??= new Test { };
+    }
+
+    private async void Submit()
+    {
+        _result = "loading";
+        _result = await _plexService.FindMatch(Model!.Field);
+        StateHasChanged();
+    }
+
+}
