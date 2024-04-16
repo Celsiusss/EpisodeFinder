@@ -1,8 +1,11 @@
 @page "/series/{seriesId}"
 @using EpisodeFinder.Database.Entities
 @using EpisodeFinder.Services
-@attribute [StreamRendering]
+@using EpisodeFinder.Database
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
 @inject SeriesService seriesService;
+@inject IDbContextFactory<EpisodeFinderContext> dbContextFactory
 
 @if (_series == null)
 {
@@ -14,6 +17,7 @@
 @foreach (var season in _series.Seasons.OrderBy(s => s.SeasonNumber))
 {
     <h2>@season.SeasonName</h2>
+    <p>Is monitoring: @season.Monitoring</p> <button @onclick="() => ToggleMonitoring(season)">toggle monitoring</button>
     <ul>
         @foreach (var episode in season.Episodes.OrderBy(e => e.EpisodeNumber))
         {
@@ -43,5 +47,12 @@
         _series = await seriesService.GetSeriesData(id);
     }
 
+    async Task ToggleMonitoring(Season season)
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync();
+        season.Monitoring = !season.Monitoring;
+        context.Entry(season).State = EntityState.Modified;
+        await context.SaveChangesAsync();
+    }
 
 }

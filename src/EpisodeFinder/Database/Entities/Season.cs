@@ -6,6 +6,7 @@ public class Season
     public string? PlexRatingKey { get; set; }
     public int SeasonNumber { get; set; }
     public string? SeasonName { get; set; }
+    public bool Monitoring { get; set; } = false;
     public ICollection<Episode> Episodes { get; set; } = [];
     
     public int SeriesId { get; set; }

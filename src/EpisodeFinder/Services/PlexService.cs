@@ -114,7 +114,7 @@ public class PlexService
                 ]
             );
         var res = await _http.GetAsync($"{_plexUrl}/library/metadata/17352/matches" + queryString);
-        var obj = Deserialize<MatchResult.MediaContainer>(await res.Content.ReadAsStreamAsync());
+        var obj = Helpers.Deserialize<MatchResult.MediaContainer>(await res.Content.ReadAsStreamAsync());
 
         if (obj.SearchResultList.Count == 0)
         {
@@ -125,35 +125,23 @@ public class PlexService
 
     public async Task<LibrarySection.MediaContainer> GetAllSeries()
     {
-        var res = await _http.GetAsync($"{_plexUrl}/library/sections/6/all");
-        var obj = Deserialize<LibrarySection.MediaContainer>(await res.Content.ReadAsStreamAsync());
-
+        var stream = await _http.GetStreamAsync($"{_plexUrl}/library/sections/6/all");
+        var obj = Helpers.Deserialize<LibrarySection.MediaContainer>(stream);
         return obj;
     }
 
     public async Task<Metadata.MediaContainer> GetMetadata(string ratingKey)
     {
-        var res = await _http.GetAsync($"{_plexUrl}/library/metadata/{ratingKey}");
-        var obj = Deserialize<Metadata.MediaContainer>(await res.Content.ReadAsStreamAsync());
+        var stream = await _http.GetStreamAsync($"{_plexUrl}/library/metadata/{ratingKey}");
+        var obj = Helpers.Deserialize<Metadata.MediaContainer>(stream);
         return obj;
     }
 
     public async Task<Metadata.MediaContainer> GetChildren(string ratingKey)
     {
-        var res = await _http.GetAsync($"{_plexUrl}/library/metadata/{ratingKey}/children");
-        var obj = Deserialize<Metadata.MediaContainer>(await res.Content.ReadAsStreamAsync());
+        var stream = await _http.GetStreamAsync($"{_plexUrl}/library/metadata/{ratingKey}/children");
+        var obj = Helpers.Deserialize<Metadata.MediaContainer>(stream);
         return obj;
     }
 
-    private T Deserialize<T>(Stream response)
-    {
-        var serializer = new XmlSerializer(typeof(T));
-        var obj = serializer.Deserialize(response);
-        if (obj == null)
-        {
-            throw new ApplicationException("Could not deserialize response of type " + typeof(T));
-        }
-
-        return (T)obj;
-    }
 }

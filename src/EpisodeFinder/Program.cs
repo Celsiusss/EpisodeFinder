@@ -24,6 +24,7 @@ builder.Services.AddScoped<HttpClient>();
 builder.Services.AddScoped<PlexService>();
 builder.Services.AddScoped<SeriesService>();
 builder.Services.AddScoped<TmdbService>();
+builder.Services.AddScoped<TorznabService>();
 
 var app = builder.Build();
 
